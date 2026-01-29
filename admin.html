@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temu Store Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #fb7701;
+            /* Temu Orange */
+            --primary-hover: #e06a00;
+            --secondary: #333;
+            --accent: #27ae60;
+            --danger: #e74c3c;
+            --light: #fff;
+            --dark: #222;
+            --bg: #f5f5f5;
+            --font-family: 'Inter', sans-serif;
+            --radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        /* Centered Layout for Login */
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h2,
+        h3 {
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .header-logo {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+
+        /* Forms */
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: opacity 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid #ddd;
+            color: #666;
+            padding: 10px 20px;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Product List */
+        .product-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            padding: 15px;
+            border-radius: var(--radius);
+            border: 1px solid #eee;
+            gap: 20px;
+        }
+
+        .product-thumb {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #eee;
+        }
+
+        .product-details {
+            flex-grow: 1;
+        }
+
+        .product-details h4 {
+            margin: 0 0 5px 0;
+            color: var(--dark);
+        }
+
+        .product-details p {
+            margin: 0;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .error-message {
+            color: var(--danger);
+            background: rgba(231, 76, 60, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        @media(max-width: 600px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .product-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Section -->
+    <div id="login-section" class="auth-container">
+        <h2 style="color: var(--primary);">Temu Admin</h2>
+        <p>Sign in to manage products</p>
+        <p class="error-message" id="login-error"></p>
+        <form id="login-form">
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="email" class="form-control" placeholder="admin@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In</button>
+        </form>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboard-section" class="dashboard-container hidden">
+        <div class="header-row">
+            <a href="#" class="header-logo">TEMU ADMIN</a>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span id="user-email" style="font-size: 0.9rem; color: #777;"></span>
+                <button id="logout-btn" class="btn btn-outline">Logout</button>
+            </div>
+        </div>
+
+        <!-- Product Form -->
+        <div class="card">
+            <h3 style="margin-top:0">Add / Edit Product</h3>
+            <form id="product-form">
+                <input type="hidden" id="edit-id">
+
+                <div class="form-group">
+                    <label class="form-label">Product Title</label>
+                    <input type="text" id="p-title" class="form-control" placeholder="e.g. Wireless Earbuds" required>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Price (PKR)</label>
+                        <input type="number" id="p-price" class="form-control" placeholder="0" required>
+                    </div>
+                    <!-- Added Category Field -->
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="p-category" class="form-control">
+                            <option value="All">Select Category</option>
+                            <option value="Food">Food</option>
+                            <option value="Machines">Machines</option>
+                            <option value="Home Accessories">Home Accessories</option>
+                            <option value="Mobiles">Mobiles</option>
+                            <option value="Electronics">Electronics</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Image URL</label>
+                    <input type="url" id="p-image" class="form-control" placeholder="https://example.com/image.jpg"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="p-desc" class="form-control" rows="3" placeholder="Product details..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" id="save-btn">Save Product</button>
+                    <button type="button" class="btn btn-outline" id="clear-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Product List -->
+        <h3 style="margin-bottom: 20px;">Inventory</h3>
+        <div id="admin-product-list" class="product-list">
+            <!-- Items loaded here -->
+            <p style="text-align:center; color:#777; padding: 40px;">Loading inventory...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, orderBy, query } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDoiawZyC2HiHF1uEjZRIFf-xMlmYz9fSU",
+            authDomain: "your-site-39a39.firebaseapp.com",
+            projectId: "your-site-39a39",
+            storageBucket: "your-site-39a39.firebasestorage.app",
+            messagingSenderId: "80434141233",
+            appId: "1:80434141233:web:56e96b032994b0823c5d10",
+            measurementId: "G-YN495C472N"
+        };
+
+        // Init Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // UI Elements
+        const loginSection = document.getElementById('login-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const loginForm = document.getElementById('login-form');
+        const productForm = document.getElementById('product-form');
+        const productList = document.getElementById('admin-product-list');
+        const logoutBtn = document.getElementById('logout-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const loginError = document.getElementById('login-error');
+        const userEmailSpan = document.getElementById('user-email');
+
+        // Form Fields
+        const pTitle = document.getElementById('p-title');
+        const pPrice = document.getElementById('p-price');
+        const pCategory = document.getElementById('p-category');
+        const pImage = document.getElementById('p-image');
+        const pDesc = document.getElementById('p-desc');
+        const editId = document.getElementById('edit-id');
+        const saveBtn = document.getElementById('save-btn');
+
+        // 1. Auth Logic
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                userEmailSpan.textContent = user.email;
+                loadProducts();
+            } else {
+                loginSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            loginError.style.display = 'none';
+            loginError.innerText = '';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                loginError.textContent = "Login Failed: " + error.code;
+                loginError.style.display = 'block';
+                console.error(error);
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => signOut(auth));
+
+        // 2. CRUD Operations
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = editId.value;
+
+            // Basic validation
+            if (!pTitle.value || !pPrice.value) {
+                alert("Please fill in required fields");
+                return;
+            }
+
+            const data = {
+                title: pTitle.value,
+                price: Number(pPrice.value),
+                category: pCategory.value,
+                imageUrl: pImage.value,
+                description: pDesc.value,
+                updatedAt: new Date() // Timestamp
+            };
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, "products", id), data);
+                } else {
+                    await addDoc(collection(db, "products"), { ...data, createdAt: new Date() });
+                }
+                clearForm();
+            } catch (error) {
+                alert("Error saving: " + error.message);
+                console.error(error);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Product';
+            }
+        });
+
+        window.deleteProduct = async (id) => {
+            if (confirm('Are you sure you want to delete this product?')) {
+                try {
+                    await deleteDoc(doc(db, "products", id));
+                } catch (e) {
+                    alert("Delete failed: " + e.message);
+                }
+            }
+        };
+
+        window.editProduct = (id, title, price, category, img, desc) => {
+            editId.value = id;
+            pTitle.value = title;
+            pPrice.value = price;
+            pCategory.value = category || 'All';
+            pImage.value = img;
+            pDesc.value = desc;
+
+            // Change UI to edit mode
+            saveBtn.textContent = 'Update Product';
+            saveBtn.classList.remove('btn-primary');
+            saveBtn.classList.add('btn-success');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            pTitle.focus();
+        };
+
+        clearBtn.addEventListener('click', clearForm);
+
+        function clearForm() {
+            productForm.reset();
+            editId.value = '';
+            saveBtn.textContent = 'Save Product';
+            saveBtn.classList.add('btn-primary');
+            saveBtn.classList.remove('btn-success');
+        }
+
+        // 3. Real-time List
+        function loadProducts() {
+            const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+            // Note: If you don't have an index for createdAt, basic collection() works but renders in random order.
+            // Using basic collection for robustness if index missing
+            const basicRef = collection(db, "products");
+
+            onSnapshot(basicRef, (snapshot) => {
+                productList.innerHTML = '';
+                if (snapshot.empty) {
+                    productList.innerHTML = '<div style="text-align:center; padding:20px;">No products found. Start adding some!</div>';
+                    return;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const p = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = 'product-item';
+
+                    // Escape strings for onclick
+                    const safeTitle = (p.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const safeDesc = (p.description || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const safeImg = (p.imageUrl || '').replace(/'/g, "\\'");
+                    const safeCat = (p.category || '').replace(/'/g, "\\'");
+
+                    div.innerHTML = `
+                        <img src="${p.imageUrl || ''}" class="product-thumb" alt="img" onerror="this.src='https://via.placeholder.com/80?text=No+Img'">
+                        <div class="product-details">
+                            <h4>${p.title} <span style="font-size:0.8em; font-weight:normal; color:#888; border:1px solid #ddd; padding:2px 6px; border-radius:10px;">${p.category || 'General'}</span></h4>
+                            <p style="font-weight:bold; color:var(--primary);">PKR ${p.price}</p>
+                            <p>${p.description || 'No description'}</p>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-outline" onclick="editProduct('${docSnap.id}', '${safeTitle}', '${p.price}', '${safeCat}', '${safeImg}', '${safeDesc}')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteProduct('${docSnap.id}')">Delete</button>
+                        </div>
+                    `;
+                    productList.appendChild(div);
+                });
+            }, (error) => {
+                console.error(error);
+                productList.innerHTML = `<p style="color:red; text-align:center;">Error loading: ${error.message}</p>`;
+            });
+        }
+    </script>
+</body>
+
+</html>
