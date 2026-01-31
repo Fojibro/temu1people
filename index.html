@@ -320,6 +320,34 @@
             font-weight: bold;
         }
 
+        .verification-modal {
+            background: white;
+            width: 90%;
+            max-width: 450px;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .verify-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .spam-note {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin: 15px 0;
+            border: 1px dashed #ffb74d;
+            text-align: left;
+        }
+
         /* Enhanced Lightbox */
         .lightbox-overlay {
             position: fixed;
@@ -570,6 +598,43 @@
         </div>
     </div>
 
+    <!-- Verification Pending Popup -->
+    <div class="modal-overlay" id="verifyOverlay" style="z-index: 3000;">
+        <div class="verification-modal">
+            <div class="verify-icon">✉️</div>
+            <h2 style="margin-bottom: 10px;">Verify Your Email</h2>
+            <p style="color: #555; margin-bottom: 5px;">We've sent a verification link to your email.</p>
+            <p style="font-weight: bold; color: var(--primary-color);" id="displayUserEmail"></p>
+
+            <div class="spam-note">
+                <strong>Important:</strong> If you don't see the email within 1 minute, please check your <b>Spam or
+                    Junk folder</b>.
+            </div>
+
+            <p style="font-size: 0.9rem; color: #777; margin-bottom: 20px;">
+                Please click the link in that email to activate your account.
+            </p>
+
+            <button class="btn-google"
+                style="margin-bottom: 15px; border-color: var(--primary-color); color: var(--primary-color);"
+                onclick="window.open('https://mail.google.com/', '_blank')">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="20">
+                Open Gmail Inbox
+            </button>
+
+            <button class="btn-auth" onclick="checkVerificationStatus()" id="checkVerifyBtn">I have Verified My
+                Email</button>
+            <p style="margin-top: 20px; font-size: 0.85rem;">
+                Didn't get the email? <span onclick="resendVerification()"
+                    style="color: var(--primary-color); cursor: pointer; font-weight: bold;">Resend Email</span>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">
+                <span onclick="handleLogout(); closeVerifyPopup();" style="color: #888; cursor: pointer;">Cancel / Sign
+                    Out</span>
+            </p>
+        </div>
+    </div>
+
     <!-- Enhanced Lightbox -->
     <div class="lightbox-overlay" id="pDetailOverlay">
         <div class="lightbox-card">
@@ -660,8 +725,46 @@
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 await sendEmailVerification(cred.user);
-                alert("Verification link sent to your email. Please verify before login.");
-                showLogin();
+                closeAuth();
+                openVerifyPopup(email);
+            } catch (e) { alert(e.message); }
+        }
+
+        window.openVerifyPopup = (email) => {
+            document.getElementById('displayUserEmail').textContent = email;
+            document.getElementById('verifyOverlay').style.display = 'flex';
+        }
+
+        window.closeVerifyPopup = () => {
+            document.getElementById('verifyOverlay').style.display = 'none';
+        }
+
+        window.checkVerificationStatus = async () => {
+            const btn = document.getElementById('checkVerifyBtn');
+            btn.disabled = true;
+            btn.textContent = "Checking...";
+
+            try {
+                await auth.currentUser.reload();
+                if (auth.currentUser.emailVerified) {
+                    alert("Success! Your email is verified.");
+                    closeVerifyPopup();
+                    location.reload();
+                } else {
+                    alert("Not verified yet. Please click the link in your email and check Spam folder.");
+                }
+            } catch (e) {
+                alert(e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "I have Verified My Email";
+            }
+        }
+
+        window.resendVerification = async () => {
+            try {
+                await sendEmailVerification(auth.currentUser);
+                alert("Verification email resent! Check your inbox/spam.");
             } catch (e) { alert(e.message); }
         }
 
